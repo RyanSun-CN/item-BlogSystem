@@ -79,8 +79,6 @@ def myblog(request, id, page, typeid):
 
     if typeid is None or typeid == 0:
         user_blog_list = Blog.objects.filter(author=request.user.id).order_by('-create_time')
-        # print(blog_list)
-        # # <QuerySet [<Blog: 文字是什么1>, <Blog: 东京>, <Blog: 上海市>, <Blog: 上海市>, <Blog: 大阪>, <Blog: 东京>, <Blog: 成都市>]>
     else:
         user_blog_list = Blog.objects.filter(author=request.user.id, type=typeid).order_by('-create_time')
 
@@ -93,8 +91,6 @@ def myblog(request, id, page, typeid):
         page_data = paginator.page(1)
     except EmptyPage:
         page_data = paginator.page(paginator.num_pages)
-    # print(page_data)
-    # # <Page 1 of 2>
 
     return render(request, "myblog.html", locals())
 
