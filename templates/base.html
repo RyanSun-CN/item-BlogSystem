@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% load static %}
+	<meta charset="UTF-8">
+    <title>{% block title %}博客首页{% endblock %}-Powered by RyanSun</title>
+	<link href="{% static "bootstrap-5.3.3-dist/css/bootstrap.css" %}" rel="stylesheet"/>
+	<link href="{% static "css/blog.css" %}" rel="stylesheet"/>
+	<script src="{% static "bootstrap-5.3.3-dist/js/bootstrap.js" %}"></script>
+	<script src="{% static "js/jquery-1.11.2.min.js" %}"></script>
+</head>
+<body>
+<div class="container">
+{% comment %}
+	布局页面 Bootstrap框架的栅格系统
+{% endcomment %}
+	<div class="row align-items-center" style="height: 120px">
+		<div class="col-md-4">
+			<img style="width: 326px;height: 60px" alt="开源博客系统" src="{% static "images/logo.png" %}">
+		</div>
+		<div class="col-md-8" style="height: 120px">
+			{% comment %}
+			<iframe width="800" height="150" 
+			        src="https://i.tianqi.com/?c=code&a=getcode&id=48&num=6&icon=1" frameborder="0">
+			</iframe>
+			{% endcomment %}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12" style="padding-top: 10px;padding-bottom: 10px">
+			<nav class="navbar navbar-expand-lg bg-body-tertiary">
+				<div class="container-fluid">
+                    <a class="navbar-brand" href="{% url 'blogmain' request.user.id 1 0 %}">博客首页</a>
+{#					button仅在小屏幕下显示，用于展开导航栏#}
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+	                        <li class="nav-item">
+                                <a class="nav-link" href="{% url 'myblog' request.user.id 1 0 %}">我的博客</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'album' request.user.id %}">我的相册</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'about' %}">关于我</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'message' request.user.id %}">我的留言</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/">博客后台管理</a>
+                            </li>
+                        </ul>
+                        <form class="d-flex" role="search" method="post" action="/search/1"
+                              onsubmit="return checkSearchForm()">
+                            {% csrf_token %}
+                            <input class="form-control me-2" type="search" placeholder="请输入搜索内容..."
+                                   aria-label="Search" name="v" id="v" value="{{ v }}">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-9">
+{#            block标签用于定义一个可供子模板覆盖的区域#}
+            {% block content %}
+	            模板内容
+            {% endblock %}
+        </div>
+    
+        <div class="col-md-3">
+            <div class="data_list">
+                <div class="data_list_title">
+                    <img src="{% static 'images/user_icon.png' %}" alt="">关于我
+                </div>
+	            <div class="user_image">
+                    {% if request.user.avatar %}
+	                    <img src="{{ request.user.avatar.url }}" alt="用户头像">
+                    {% else %}
+	                    <img src="{% static 'images/默认头像.png' %}" alt="默认头像">
+		            {% endif %}
+                </div>
+                <div class="nickName">{{ request.user.name }}</div>
+                <div class="userSign">{{ request.user.introduce }}</div>
+            </div>
+            <div class="data_list">
+                <div class="data_list_title">
+                    <img src="{% static 'images/byType_icon.png' %}" alt="">按日志类别
+                </div>
+                <div class="datas">
+                    <ul>
+	                    {% if blog_list %}
+		                    {% for blogtype in blogtype_list %}
+	                            <li>
+		                            <span>
+			                            <a href="{% url 'blogmain' request.user.id 1 blogtype.id %}">{{ blogtype }}</a>
+		                            </span>
+	                            </li>
+		                    {% empty %}
+			                    暂无日志类别
+	                        {% endfor %}
+	                    {% endif %}
+                        {% if user_blog_list %}
+		                    {% for blogtype in blogtype_list %}
+	                            <li>
+		                            <span>
+			                            <a href="{% url 'myblog' request.user.id 1 blogtype.id %}">{{ blogtype }}</a>
+		                            </span>
+	                            </li>
+		                    {% empty %}
+			                    暂无日志类别
+	                        {% endfor %}
+	                    {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="data_list">
+                <div class="data_list_title">
+                    <img src="{% static 'images/link_icon.png' %}" alt="">友情链接
+                </div>
+                <div class="datas">
+                    <ul>
+	                    {% for linkname in linkname_list %}
+                        <li>
+	                        <span><a href="{{ linkname.url }}" target="_blank">{{ linkname }}</a></span>
+                        </li>
+                        {% empty %}
+	                        暂无友情链接
+	                    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div align="center" style="padding-top: 120px">
+                <span style="float: left;">Powered by RyanSun</span>
+                Copyright © RyanSun 版权所有
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% block script %}
+	
+{% endblock %}
+
+<script>
+	function checkSearchForm() {
+        var v = $("#v").val();
+        if (v == null || v == '') {
+            alert("请输入搜索内容！");
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

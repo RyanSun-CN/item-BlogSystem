@@ -1,0 +1,73 @@
+{% extends "pic_base.html" %}
+
+{% block title %}
+我的相册
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+	<div>
+		<div class="row d-flex justify-content-center align-items-center">
+			{% if not album_list %}
+				<div>暂无图片</div>
+			{% else %}
+				{% for album in page_data.object_list %}
+					<div class="col-md-4 text-center">
+						<i><img src="{{ album.pic.url }}" style="height: 400px" alt="..."></i>
+					</div>
+					<div class="col-md-2 text-center">
+						<h5>{{ album.title }}</h5>
+						<span>{{ album.info }}</span>
+					</div>
+				{% endfor %}
+			{% endif %}
+		</div>
+		<br>
+		<div>
+			<nav aria-label="...">
+	            <ul class="pagination justify-content-center">
+{#		            <a href="?page=2">测试按钮</a>#}
+		            {% if page_data.has_previous %}
+			            <li>
+			                <a class="page-link" 
+			                   href="?page=1">首页
+			                </a>
+			            </li>
+			            <li>
+			                <a class="page-link" 
+			                   href="?page={{ page_data.previous_page_number }}">上一页</a>
+			            </li>
+		            {% endif %}
+
+	                <li class="page-item disabled">
+                        <a class="page-link">第 {{ page_data.number }} 页 / 共 {{ page_data.paginator.num_pages }} 页</a>
+                    </li>
+
+	                {% if page_data.object_list %}
+		                {% for page in page_data.paginator.page_range %}
+			                {% if page_data.number == page %}
+				                <li class="page-item active" aria-current="page">
+	                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+	                            </li>
+			                {% else %}
+				                <li class="page-item">
+	                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+	                            </li>
+			                {% endif %}
+		                {% endfor %}
+	                {% endif %}
+
+		            {% if page_data.has_next %}
+		                <li class="page-item">
+		                    <a class="page-link" href="?page={{ page_data.next_page_number }}">下一页</a>
+		                </li>
+			            <li class="page-item">
+                            <a class="page-link" href="?page={{ page_data.paginator.num_pages }}">尾页</a>
+                        </li>
+	                {% endif %}
+	            </ul>
+			</nav>
+		</div>
+	</div>
+{% endblock %}

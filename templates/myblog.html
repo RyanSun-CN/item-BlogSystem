@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+我的博客
+{% endblock %}
+
+{% block content %}
+	<div class="data_list">
+		<div class="data_list_title">
+			<img src="{% static 'images/list_icon.png' %}" alt="">博客列表
+		</div>
+		<div class="datas">
+			{% if not page_data.object_list %}
+				<p style="text-align: center; padding-top: 50px">未查询到博客内容</p>
+			{% else %}
+				<ul>
+				{% for blog in page_data.object_list%}
+					<li style="margin-bottom: 30px">
+					{% comment %}
+					<span class="date">
+						<a href="">{{ blog.create_time }}</a>
+					</span>
+					{% endcomment %}
+					<span class="title">
+						<a href="{% url 'blog' id blog.id %}">{{ blog.title }}</a>
+					</span>
+					<span class="summary">
+						摘要
+						<a href="">{{ blog.abstract }}</a>
+					</span>
+					<span class="img">
+						{% if blog.image %}
+							<img src="{{ blog.image.url }}" alt="博客图片">
+						{% else %}
+							暂无博客图片
+						{% endif %}
+					</span>
+					<span class="info">
+						发表于{{ blog.create_time | date:"Y-m-d" }}
+						<br>
+						阅读量{{ blog.reads }}
+					</span>
+						<br><hr>
+					</li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		</div>
+		<div>
+			<nav aria-label="...">
+	            <ul class="pagination justify-content-center">
+		            {% if page_data.has_previous %}
+			            <li>
+			                <a class="page-link" 
+			                   href="{% url 'myblog' id 1 typeid %}">首页</a>
+			            </li>
+			            <li>
+			                <a class="page-link" 
+			                   href="{% url 'myblog' id page_data.previous_page_number typeid %}">上一页</a>
+			            </li>
+		            {% endif %}
+	            
+	                {% if page_data.object_list %}
+		                {% for page in page_data.paginator.page_range %}
+			                {% if page_data.number == page %}
+				                <li class="page-item active" aria-current="page">
+	                                <a class="page-link" href="{% url 'myblog' id page typeid %}">{{ page }}</a>
+	                            </li>
+			                {% else %}
+				                <li class="page-item">
+	                                <a class="page-link" href="{% url 'myblog' id page typeid %}">{{ page }}</a>
+	                            </li>
+			                {% endif %}
+		                {% endfor %}
+	                {% endif %}
+	            
+		            {% if page_data.has_next %}
+		                <li class="page-item">
+		                    <a class="page-link" href="{% url 'myblog' id page_data.next_page_number typeid %}">下一页</a>
+		                </li>
+	                {% endif %}
+	            </ul>
+			</nav>
+		</div>
+	</div>
+
+{% endblock %}

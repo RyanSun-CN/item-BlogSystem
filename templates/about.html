@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+个人信息
+{% endblock %}
+
+{% block content %}
+	<div class="data_list">
+		<div>用户名：{{ user.username }}</div>
+		<div>昵称：{{ user.name }}</div>
+		<div>简介：{{ user.introduce }}</div>
+		<hr>
+		<p>职业：{{ user.profession }}</p>
+		<p>电子邮箱：{{ user.email }}</p>
+		<p>联系电话：{{ user.telephone }}</p>
+    </div>
+{% endblock %}

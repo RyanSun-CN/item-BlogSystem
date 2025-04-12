@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+	<div class="data_list">
+		<div class="data_list_title">
+			<img src="{% static 'images/blog_show_icon.png' %}" alt="">博客信息
+		</div>
+		<div>
+			<div class="blog_title">
+				<h3>{{ blog.title }}</h3>
+			</div>
+			<div class="blog_info">
+				作者：<a href="{% url 'message' user.id %}">{{ user.name }}</a>&nbsp;|&nbsp;发布时间：{{ blog.create_time | date:"Y-m-d" }}&nbsp;|&nbsp;阅读量：{{ blog.reads }}
+			</div>
+			<div class="blog_content">
+				<!-- safe过滤器可以转移html标签 -->
+				{{ blog.content | safe }}
+			</div>
+		</div>
+	</div>
+	
+	<div class="data_list">
+		<div class="data_list_title">
+			<img src="{% static 'images/publish_comment_icon.png' %}" alt="">发表评论
+		</div>
+		<div class="publish_comment">
+			<form action="" method="post" onsubmit="return checkForm()">
+				{% csrf_token %}
+				<div style="padding: 10px">
+					<input type="hidden" name="user" id="user" value="{{ request.user }}">
+					<font><strong>用户：{{ request.user }}</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="radio" id="r_user" value="匿名用户"><label for="r_user">&nbsp;匿名</label>
+				</div>
+				<div style="padding: 10px">
+					<label style="padding-bottom: 10px" for="content"><strong>评论</strong></label>
+					<textarea name="content" id="content" cols="110" rows="3" placeholder="请发表评论..."></textarea>
+				</div>
+				<div class="publishButton">
+					<button class="btn btn-primary" type="submit">发表评论</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	<div class="data_list">
+		<div class="data_list_title">
+			<img src="{% static 'images/comment_icon.png' %}" alt="">评论
+		</div>
+		<div class="commentDatas">
+			{% if not page_data.object_list %}
+				暂无评论
+			{% else %}
+				{% for comment in page_data.object_list %}
+					<div class="comment">
+						<span>
+							<font>第 {{ forloop.counter0 | add:page_data.start_index }} 楼</font>&nbsp;&nbsp;&nbsp;
+						</span>
+						<span>
+							<font>{{ comment.user }}</font>&nbsp;&nbsp;[{{ comment.create_time | date:"Y-m-d H:i:s" }}]
+							<br>
+						</span>
+						<span>
+							{{ comment.content }}
+						</span>
+					</div>
+				{% endfor %}
+			{% endif %}
+		</div>
+		<div>
+			<nav aria-label="...">
+	            <ul class="pagination justify-content-center">
+{#		            <a href="?page=2">测试按钮</a>#}
+		            {% if page_data.has_previous %}
+			            <li>
+			                <a class="page-link" 
+			                   href="?page=1">首页
+			                </a>
+			            </li>
+			            <li>
+			                <a class="page-link" 
+			                   href="?page={{ page_data.previous_page_number }}">上一页</a>
+			            </li>
+		            {% endif %}
+
+	                <li class="page-item disabled">
+                        <a class="page-link">第 {{ page_data.number }} 页 / 共 {{ page_data.paginator.num_pages }} 页</a>
+                    </li>
+
+	                {% if page_data.object_list %}
+		                {% for page in page_data.paginator.page_range %}
+			                {% if page_data.number == page %}
+				                <li class="page-item active" aria-current="page">
+	                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+	                            </li>
+			                {% else %}
+				                <li class="page-item">
+	                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+	                            </li>
+			                {% endif %}
+		                {% endfor %}
+	                {% endif %}
+
+		            {% if page_data.has_next %}
+		                <li class="page-item">
+		                    <a class="page-link" href="?page={{ page_data.next_page_number }}">下一页</a>
+		                </li>
+			            <li class="page-item">
+                            <a class="page-link" href="?page={{ page_data.paginator.num_pages }}">尾页</a>
+                        </li>
+	                {% endif %}
+	            </ul>
+			</nav>
+		</div>
+	</div>
+{% endblock %}
+
+{% block script %}
+	<script>
+		function checkForm() {
+			var user = $("#user").val()
+			var content = $("#content").val()
+			
+			if(content == null || content === ''){
+                alert("请输入评论！")
+				return false
+			}
+            {% comment %}
+            else if(user == null || user === ''){
+                alert("请输入用户")
+				return false
+			}
+			{% endcomment %}
+            {#alert(user)#}
+            return true
+        }
+	</script>
+	
+	<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const radio = document.getElementById("r_user");
+            let selected = false;
+
+            radio.addEventListener("click", function () {
+                if (selected) {
+                radio.checked = false;
+                }
+                selected = radio.checked;
+            });
+        });
+	</script>
+	
+	<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const radio = document.getElementById("r_user");
+            const h_input = document.getElementById("user");
+	        
+            radio.addEventListener("change", function () {
+                if (radio.checked) {
+                    h_input.value = "匿名用户";
+                }
+            });
+        });
+	</script>
+{% endblock %}

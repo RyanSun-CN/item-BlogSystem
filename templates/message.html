@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+我的留言
+{% endblock %}
+
+{% block content %}
+	{% if request.user.id != uid %}
+		<div class="data_list">
+			<div>用户名：{{ user.username }}</div>
+			<div>昵称：{{ user.name }}</div>
+			<div>简介：{{ user.introduce }}</div>
+			<hr>
+			<p>职业：{{ user.profession }}</p>
+			<p>电子邮箱：{{ user.email }}</p>
+			<p>联系电话：{{ user.telephone }}</p>
+		</div>
+
+		
+		<div class="data_list">
+			<div class="data_list_title">
+				<img src="{% static 'images/publish_comment_icon.png' %}" alt="">发布留言
+			</div>
+			<div class="gbox">
+				<form action="" method="post" onsubmit="return checkForm()">
+					{% csrf_token %}
+					<div style="padding: 10px">
+						<input type="hidden" name="name" id="name" value="{{ request.user }}">
+						<font><strong>用户：{{ request.user }}</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;
+					</div>
+					<div style="padding: 10px">
+						<input type="hidden" name="email" id="email" value="{{ request.user.email }}">
+						<font><strong>邮箱：{{ request.user.email }}</strong></font>&nbsp;&nbsp;&nbsp;&nbsp;
+					</div>
+					<div style="padding: 10px">
+						<label style="padding-bottom: 10px" for="content"><strong>留言</strong></label>
+						<textarea name="content" id="content" cols="110" rows="3" placeholder="请留言..."></textarea>
+					</div>
+					<div class="publishButton" style="text-align: center">
+						<button class="btn btn-primary" type="submit">发布留言</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	{% else %}
+		<div class="data_list">
+			<div class="data_list_title">
+				<img src="{% static 'images/comment_icon.png' %}" alt="">我的留言
+			</div>
+			<div class="msg">
+				{% if not page_data.object_list %}
+					暂无留言
+				{% else %}
+					{% for message in page_data.object_list %}
+						<ul style="background: url({% static 'images/defaultuser.jpg'%}) no-repeat top 5px left 10px" >
+							<span class="msgtime">{{ message.create_time | date:"Y-m-d h:i:s" }}</span>
+							{{ message.name }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ message.email }}
+							<br>
+							{{ message.content }}
+						</ul>
+						
+					{% endfor %}
+				{% endif %}
+			</div>
+		
+			<div>
+				<nav aria-label="...">
+		            <ul class="pagination justify-content-center">
+	{#		            <a href="?page=2">测试按钮</a>#}
+			            {% if page_data.has_previous %}
+				            <li>
+				                <a class="page-link" 
+				                   href="?page=1">首页
+				                </a>
+				            </li>
+				            <li>
+				                <a class="page-link" 
+				                   href="?page={{ page_data.previous_page_number }}">上一页</a>
+				            </li>
+			            {% endif %}
+	
+		                <li class="page-item disabled">
+	                        <a class="page-link">第 {{ page_data.number }} 页 / 共 {{ page_data.paginator.num_pages }} 页</a>
+	                    </li>
+	
+		                {% if page_data.object_list %}
+			                {% for page in page_data.paginator.page_range %}
+				                {% if page_data.number == page %}
+					                <li class="page-item active" aria-current="page">
+		                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+		                            </li>
+				                {% else %}
+					                <li class="page-item">
+		                                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+		                            </li>
+				                {% endif %}
+			                {% endfor %}
+		                {% endif %}
+	
+			            {% if page_data.has_next %}
+			                <li class="page-item">
+			                    <a class="page-link" href="?page={{ page_data.next_page_number }}">下一页</a>
+			                </li>
+				            <li class="page-item">
+	                            <a class="page-link" href="?page={{ page_data.paginator.num_pages }}">尾页</a>
+	                        </li>
+		                {% endif %}
+		            </ul>
+				</nav>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+
+{% block script %}
+	<script>
+		function checkForm() {
+			var user = $("#name").val()
+			var content = $("#content").val()
+			
+			if(content == null || content === ''){
+                alert("请输入评论！")
+				return false
+			}
+            {% comment %}
+            else if(user == null || user === ''){
+                alert("请输入用户")
+				return false
+			}
+			{% endcomment %}
+            {#alert(user)#}
+            return true
+        }
+	</script>
+{% endblock %}
